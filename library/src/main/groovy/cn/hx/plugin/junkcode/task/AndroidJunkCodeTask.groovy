@@ -8,6 +8,7 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import groovy.text.GStringTemplateEngine
+import org.bouncycastle.jcajce.provider.digest.MD5
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
@@ -15,6 +16,7 @@ import org.gradle.api.tasks.OutputDirectories
 import org.gradle.api.tasks.TaskAction
 
 import javax.lang.model.element.Modifier
+import java.security.MessageDigest
 
 class AndroidJunkCodeTask extends DefaultTask {
 
@@ -47,20 +49,20 @@ class AndroidJunkCodeTask extends DefaultTask {
      */
     void generateClasses() {
         def javaDir = new File(outDir, "java")
-        for (int i = 0; i < config.packageCount; i++) {
+        for (int i = 0; i < config.packageCount; i ++) {
             String packageName = config.packageBase + "." + generateName(i)
             //生成Activity
             for (int j = 0; j < config.activityCountPerPackage; j++) {
-                def activityPreName = generateName(j)
+                def activityPreName = (i + j)
                 generateActivity(packageName, activityPreName)
             }
             //生成其它类
             for (int j = 0; j < config.otherCountPerPackage; j++) {
-                def className = generateName(j).capitalize()
+                def className = generateName(i + j).capitalize()
                 def typeBuilder = TypeSpec.classBuilder(className)
                 typeBuilder.addModifiers(Modifier.PUBLIC)
                 for (int k = 0; k < config.methodCountPerClass; k++) {
-                    def methodName = generateName(k)
+                    def methodName = generateName(i + k)
                     def methodBuilder = MethodSpec.methodBuilder(methodName)
                     generateMethods(methodBuilder)
                     typeBuilder.addMethod(methodBuilder.build())
@@ -364,20 +366,11 @@ class AndroidJunkCodeTask extends DefaultTask {
      * @param index
      * @return
      */
-    static String generateName(int index) {
-        def sb = new StringBuffer()
-        for (i in 0..4) {
-            sb.append(abc[random.nextInt(abc.size())])
-        }
-        int temp = index
-        while (temp >= 0) {
-            sb.append(abc[temp % abc.size()])
-            temp = temp / abc.size()
-            if (temp == 0) {
-                temp = -1
-            }
-        }
-        sb.append(index.toString())
-        return sb.toString()
+     String generateName(int index) {
+        def packName = config.getPackageBase()
+        def resPrefix = config.getResPrefix()
+        def name = "${packName}${resPrefix}$index"
+        def newName = MessageDigest.getInstance("MD5").digest("$name".bytes).encodeHex().toString().toLowerCase()
+        return newName
     }
 }
