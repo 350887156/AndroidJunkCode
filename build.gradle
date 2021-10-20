@@ -5,11 +5,12 @@ buildscript {
         google()
         mavenCentral()
         mavenLocal()
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.github.qq549631030:android-junk-code:1.1.2"
+        classpath "com.github.350887156:android-junk-code:1.1.3"
         classpath 'com.vanniktech:gradle-maven-publish-plugin:0.18.0'
         classpath "com.getkeepsafe.dexcount:dexcount-gradle-plugin:3.0.1"
 
@@ -22,6 +23,11 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    plugins.withId("com.github.350887156:android-junk-code") {
+        mavenPublish {
+            sonatypeHost = "S01"
+        }
     }
 }
 

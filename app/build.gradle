@@ -35,14 +35,14 @@ android {
 androidJunkCode {
     def config = {
         packageBase = "cn.hx.plugin.ui"
-        packageCount = 30
+        packageCount = 1
         activityCountPerPackage = 3
         excludeActivityJavaFile = false
-        otherCountPerPackage = 50
-        methodCountPerClass = 20
+        otherCountPerPackage = 10
+        methodCountPerClass = 10
         resPrefix = "junk_"
-        drawableCount = 300
-        stringCount = 300
+        drawableCount = 5
+        stringCount = 5
     }
     variantConfig {
         debug config

@@ -22,6 +22,8 @@ class JunkCodeConfig {
     int drawableCount = 0
     @Input
     int stringCount = 0
+    @Input
+    boolean randomGenerateName = true
 
     @Internal
     String name = ""

@@ -8,7 +8,6 @@ import com.squareup.javapoet.JavaFile
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeSpec
 import groovy.text.GStringTemplateEngine
-import org.bouncycastle.jcajce.provider.digest.MD5
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
@@ -17,7 +16,6 @@ import org.gradle.api.tasks.TaskAction
 
 import javax.lang.model.element.Modifier
 import java.security.MessageDigest
-
 class AndroidJunkCodeTask extends DefaultTask {
 
     static def random = new Random()
@@ -49,20 +47,21 @@ class AndroidJunkCodeTask extends DefaultTask {
      */
     void generateClasses() {
         def javaDir = new File(outDir, "java")
-        for (int i = 0; i < config.packageCount; i ++) {
-            String packageName = config.packageBase + "." + generateName(i)
+        def packageBase = config.packageBase.toLowerCase()
+        for (int i = 0; i < config.packageCount; i++) {
+            String packageName = packageBase + "." + generateName(i)
             //生成Activity
             for (int j = 0; j < config.activityCountPerPackage; j++) {
-                def activityPreName = (i + j)
+                def activityPreName = generateName(j)
                 generateActivity(packageName, activityPreName)
             }
             //生成其它类
             for (int j = 0; j < config.otherCountPerPackage; j++) {
-                def className = generateName(i + j).capitalize()
+                def className = generateName(j).capitalize()
                 def typeBuilder = TypeSpec.classBuilder(className)
                 typeBuilder.addModifiers(Modifier.PUBLIC)
                 for (int k = 0; k < config.methodCountPerClass; k++) {
-                    def methodName = generateName(i + k)
+                    def methodName = generateName(k)
                     def methodBuilder = MethodSpec.methodBuilder(methodName)
                     generateMethods(methodBuilder)
                     typeBuilder.addMethod(methodBuilder.build())
@@ -367,10 +366,24 @@ class AndroidJunkCodeTask extends DefaultTask {
      * @return
      */
      String generateName(int index) {
-        def packName = config.getPackageBase()
-        def resPrefix = config.getResPrefix()
-        def name = "${packName}${resPrefix}$index"
-        def newName = MessageDigest.getInstance("MD5").digest("$name".bytes).encodeHex().toString().toLowerCase()
-        return newName
-    }
+         def sb = new StringBuffer()
+         int temp = index
+         while (temp >= 0) {
+             sb.append(abc[temp % abc.size()])
+             temp = temp / abc.size()
+             if (temp == 0) {
+                 temp = -1
+             }
+         }
+         sb.append(index.toString())
+         if (config.randomGenerateName) {
+             for (i in 0..4) {
+                 sb.append(abc[random.nextInt(abc.size())])
+             }
+         } else {
+             def packageTemp = "${config.packageBase.toLowerCase()}${index.toString()}"
+             sb.append("${packageTemp.md5().toLowerCase().substring(0,5)}");
+         }
+         return sb.toString()
+     }
 }
