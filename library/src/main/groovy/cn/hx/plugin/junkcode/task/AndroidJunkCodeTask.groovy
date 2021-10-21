@@ -492,14 +492,8 @@ class AndroidJunkCodeTask extends DefaultTask {
              }
          }
          sb.append(index.toString())
-         if (config.randomGenerateName) {
-             for (i in 0..4) {
-                 sb.append(abc[random.nextInt(abc.size())])
-             }
-         } else {
-             def packageTemp = "${config.packageBase.toLowerCase()}${index.toString()}"
-             sb.append("${packageTemp.md5().toLowerCase().substring(0,6)}");
-         }
+         def packageTemp = "${config.packageBase.toLowerCase()}${index.toString()}"
+         sb.append("${packageTemp.md5().toLowerCase().substring(0,10)}");
          return sb.toString()
      }
 }
