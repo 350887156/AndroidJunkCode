@@ -48,6 +48,7 @@ class AndroidJunkCodeTask extends DefaultTask {
     void generateClasses() {
         def javaDir = new File(outDir, "java")
         def packageBase = config.packageBase.toLowerCase()
+        def packageBaseMd5 = packageBase.md5()
         for (int i = 0; i < config.packageCount; i++) {
             String packageName = packageBase + "." + generateName(i)
             //生成Activity
@@ -63,7 +64,7 @@ class AndroidJunkCodeTask extends DefaultTask {
                 for (int k = 0; k < config.methodCountPerClass; k++) {
                     def methodName = generateName(k)
                     def methodBuilder = MethodSpec.methodBuilder(methodName)
-                    generateMethods(methodBuilder)
+                    generateMethods(methodBuilder,packageBaseMd5,k)
                     typeBuilder.addMethod(methodBuilder.build())
                 }
                 def fileBuilder = JavaFile.builder(packageName, typeBuilder.build())
@@ -76,9 +77,18 @@ class AndroidJunkCodeTask extends DefaultTask {
      * 生成随机方法
      * @param methodBuilder
      */
-    static void generateMethods(MethodSpec.Builder methodBuilder) {
-        switch (random.nextInt(5)) {
-            case 0:
+    static void generateMethods(MethodSpec.Builder methodBuilder,String packageBaseMd5, int index) {
+
+        def sub = ""
+        def packageLength = packageBaseMd5.length()
+        if (packageLength > index) {
+            sub = packageBaseMd5.substring(index, index + 1)
+        } else {
+            sub = packageBaseMd5.substring(index % packageLength, index % packageLength + 1)
+        }
+
+        switch (sub) {
+            case "a":
                 methodBuilder.addStatement("long now = \$T.currentTimeMillis()", System.class)
                         .beginControlFlow("if (\$T.currentTimeMillis() < now)", System.class)
                         .addStatement("\$T.out.println(\$S)", System.class, "Time travelling, woo hoo!")
@@ -88,25 +98,130 @@ class AndroidJunkCodeTask extends DefaultTask {
                         .addStatement("\$T.out.println(\$S)", System.class, "Ok, time still moving forward")
                         .endControlFlow()
                 break
-            case 1:
+            case "b":
                 methodBuilder.addCode(""
                         + "int total = 0;\n"
                         + "for (int i = 0; i < 10; i++) {\n"
                         + "  total += i;\n"
                         + "}\n")
                 break
-            case 2:
+            case "c":
                 methodBuilder.beginControlFlow("try")
                         .addStatement("throw new Exception(\$S)", "Failed")
                         .nextControlFlow("catch (\$T e)", Exception.class)
                         .addStatement("throw new \$T(e)", RuntimeException.class)
                         .endControlFlow()
                 break
-            case 3:
+            case "d":
                 methodBuilder.returns(Date.class)
                         .addStatement("return new \$T()", Date.class)
                 break
-            case 4:
+            case "e":
+                methodBuilder.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(void.class)
+                        .addParameter(String[].class, "args")
+                        .addStatement("\$T.out.println(\$S)", System.class, "Hello")
+                break
+
+
+            case "f":
+                methodBuilder.addStatement("long now = \$T.currentTimeMillis()", System.class)
+                        .beginControlFlow("if (\$T.currentTimeMillis() < now)", System.class)
+                        .addStatement("\$T.out.println(\$S)", System.class, "Time travelling, woo hoo!")
+                        .nextControlFlow("else if (\$T.currentTimeMillis() == now)", System.class)
+                        .addStatement("\$T.out.println(\$S)", System.class, "Time stood still!")
+                        .nextControlFlow("else")
+                        .addStatement("\$T.out.println(\$S)", System.class, "Ok, time still moving forward")
+                        .endControlFlow()
+                break
+            case "g":
+                methodBuilder.addCode(""
+                        + "int total = 0;\n"
+                        + "for (int i = 0; i < 10; i++) {\n"
+                        + "  total += i;\n"
+                        + "}\n")
+                break
+            case "h":
+                methodBuilder.beginControlFlow("try")
+                        .addStatement("throw new Exception(\$S)", "Failed")
+                        .nextControlFlow("catch (\$T e)", Exception.class)
+                        .addStatement("throw new \$T(e)", RuntimeException.class)
+                        .endControlFlow()
+                break
+            case "i":
+                methodBuilder.returns(Date.class)
+                        .addStatement("return new \$T()", Date.class)
+                break
+            case "j":
+                methodBuilder.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(void.class)
+                        .addParameter(String[].class, "args")
+                        .addStatement("\$T.out.println(\$S)", System.class, "Hello")
+                break
+            case "k":
+                methodBuilder.addStatement("long now = \$T.currentTimeMillis()", System.class)
+                        .beginControlFlow("if (\$T.currentTimeMillis() < now)", System.class)
+                        .addStatement("\$T.out.println(\$S)", System.class, "Time travelling, woo hoo!")
+                        .nextControlFlow("else if (\$T.currentTimeMillis() == now)", System.class)
+                        .addStatement("\$T.out.println(\$S)", System.class, "Time stood still!")
+                        .nextControlFlow("else")
+                        .addStatement("\$T.out.println(\$S)", System.class, "Ok, time still moving forward")
+                        .endControlFlow()
+                break
+            case "l":
+                methodBuilder.addStatement("long now = \$T.currentTimeMillis()", System.class)
+                        .beginControlFlow("if (\$T.currentTimeMillis() < now)", System.class)
+                        .addStatement("\$T.out.println(\$S)", System.class, "Time travelling, woo hoo!")
+                        .nextControlFlow("else if (\$T.currentTimeMillis() == now)", System.class)
+                        .addStatement("\$T.out.println(\$S)", System.class, "Time stood still!")
+                        .nextControlFlow("else")
+                        .addStatement("\$T.out.println(\$S)", System.class, "Ok, time still moving forward")
+                        .endControlFlow()
+                break
+            case "m":
+                methodBuilder.addCode(""
+                        + "int total = 0;\n"
+                        + "for (int i = 0; i < 10; i++) {\n"
+                        + "  total += i;\n"
+                        + "}\n")
+                break
+            case "n":
+                methodBuilder.beginControlFlow("try")
+                        .addStatement("throw new Exception(\$S)", "Failed")
+                        .nextControlFlow("catch (\$T e)", Exception.class)
+                        .addStatement("throw new \$T(e)", RuntimeException.class)
+                        .endControlFlow()
+                break
+            case "o":
+                methodBuilder.returns(Date.class)
+                        .addStatement("return new \$T()", Date.class)
+                break
+            case "p":
+                methodBuilder.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .returns(void.class)
+                        .addParameter(String[].class, "args")
+                        .addStatement("\$T.out.println(\$S)", System.class, "Hello")
+                break
+
+            case "q":
+                methodBuilder.addCode(""
+                        + "int total = 0;\n"
+                        + "for (int i = 0; i < 10; i++) {\n"
+                        + "  total += i;\n"
+                        + "}\n")
+                break
+            case "r":
+                methodBuilder.beginControlFlow("try")
+                        .addStatement("throw new Exception(\$S)", "Failed")
+                        .nextControlFlow("catch (\$T e)", Exception.class)
+                        .addStatement("throw new \$T(e)", RuntimeException.class)
+                        .endControlFlow()
+                break
+            case "s":
+                methodBuilder.returns(Date.class)
+                        .addStatement("return new \$T()", Date.class)
+                break
+            case "t":
                 methodBuilder.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .returns(void.class)
                         .addParameter(String[].class, "args")
@@ -129,6 +244,7 @@ class AndroidJunkCodeTask extends DefaultTask {
         def javaDir = new File(outDir, "java")
         def className = activityPreName.capitalize() + "Activity"
         def layoutName = "${config.resPrefix.toLowerCase()}${packageName.replace(".", "_")}_activity_${activityPreName}"
+        def packageBaseMd5 = packageName.md5()
         generateLayout(layoutName)
         if (!config.excludeActivityJavaFile) {
             def typeBuilder = TypeSpec.classBuilder(className)
@@ -147,7 +263,7 @@ class AndroidJunkCodeTask extends DefaultTask {
             for (int j = 0; j < config.methodCountPerClass; j++) {
                 def methodName = generateName(j)
                 def methodBuilder = MethodSpec.methodBuilder(methodName)
-                generateMethods(methodBuilder)
+                generateMethods(methodBuilder,packageBaseMd5,j)
                 typeBuilder.addMethod(methodBuilder.build())
             }
             def fileBuilder = JavaFile.builder(packageName, typeBuilder.build())
@@ -382,7 +498,7 @@ class AndroidJunkCodeTask extends DefaultTask {
              }
          } else {
              def packageTemp = "${config.packageBase.toLowerCase()}${index.toString()}"
-             sb.append("${packageTemp.md5().toLowerCase().substring(0,5)}");
+             sb.append("${packageTemp.md5().toLowerCase().substring(0,6)}");
          }
          return sb.toString()
      }
