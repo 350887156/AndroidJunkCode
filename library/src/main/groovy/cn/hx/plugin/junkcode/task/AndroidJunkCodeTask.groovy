@@ -20,7 +20,7 @@ class AndroidJunkCodeTask extends DefaultTask {
 
     static def random = new Random()
 
-    static abc = "abcdefghijklmnopqrstuvwxyz".toCharArray()
+    static abc = "ejlrgdfgjlkdjlfgcbvkjreflcbvmnjkergfjkd".toCharArray()
 
     @Nested
     JunkCodeConfig config = new JunkCodeConfig()
@@ -53,18 +53,18 @@ class AndroidJunkCodeTask extends DefaultTask {
             String packageName = packageBase + "." + generateName(i)
             //生成Activity
             for (int j = 0; j < config.activityCountPerPackage; j++) {
-                def activityPreName = generateName(j)
+                def activityPreName = generateName(i+j)
                 generateActivity(packageName, activityPreName)
             }
             //生成其它类
             for (int j = 0; j < config.otherCountPerPackage; j++) {
-                def className = generateName(j).capitalize()
+                def className = generateName(i+j).capitalize()
                 def typeBuilder = TypeSpec.classBuilder(className)
                 typeBuilder.addModifiers(Modifier.PUBLIC)
                 for (int k = 0; k < config.methodCountPerClass; k++) {
-                    def methodName = generateName(k)
+                    def methodName = generateName(i+j+k)
                     def methodBuilder = MethodSpec.methodBuilder(methodName)
-                    generateMethods(methodBuilder,packageBaseMd5,k)
+                    generateMethods(methodBuilder,methodName,i+j+k)
                     typeBuilder.addMethod(methodBuilder.build())
                 }
                 def fileBuilder = JavaFile.builder(packageName, typeBuilder.build())
@@ -77,14 +77,14 @@ class AndroidJunkCodeTask extends DefaultTask {
      * 生成随机方法
      * @param methodBuilder
      */
-    static void generateMethods(MethodSpec.Builder methodBuilder,String packageBaseMd5, int index) {
+    static void generateMethods(MethodSpec.Builder methodBuilder,String methodName, int index) {
 
         def sub = ""
-        def packageLength = packageBaseMd5.length()
+        def packageLength = methodName.length()
         if (packageLength > index) {
-            sub = packageBaseMd5.substring(index, index + 1)
+            sub = methodName.substring(index, index + 1)
         } else {
-            sub = packageBaseMd5.substring(index % packageLength, index % packageLength + 1)
+            sub = methodName.substring(index % packageLength, index % packageLength + 1)
         }
 
         switch (sub) {
@@ -263,7 +263,7 @@ class AndroidJunkCodeTask extends DefaultTask {
             for (int j = 0; j < config.methodCountPerClass; j++) {
                 def methodName = generateName(j)
                 def methodBuilder = MethodSpec.methodBuilder(methodName)
-                generateMethods(methodBuilder,packageBaseMd5,j)
+                generateMethods(methodBuilder,methodName,j)
                 typeBuilder.addMethod(methodBuilder.build())
             }
             def fileBuilder = JavaFile.builder(packageName, typeBuilder.build())
